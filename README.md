@@ -77,7 +77,15 @@ Você precisará digitar a senha que criou anteriormente.
     db = DBConnection(db_name="seu_banco", user="seu_usuario", password="sua_senha")
     ```
 
-2.  **Execute o Programa**
+
+
+2.  **Popule o Banco de Dados**
+Navegue até o diretório raiz do projeto (`projeto_evasao/`) e execute python3 popular_banco.py
+
+Para que o banco tenha dados para exibição
+Lembrando "São dados ficticios para testes e demonstração"
+
+3.  **Execute o Programa**
 
     Navegue até o diretório raiz do projeto (`projeto_evasao/`) e execute o script principal:
 
