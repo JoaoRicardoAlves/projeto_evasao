@@ -6,13 +6,13 @@ Este projeto é um sistema de console para gerenciar e analisar dados sobre a ev
 
 - Python 3.x
 - PostgreSQL
-- Biblioteca Python: `psycopg2-binary`
+- Bibliotecas Python: `psycopg2-binary`, `Faker`
 
-## Configuração do Ambiente (Linux)
+## Configuração do Ambiente
 
 ### 1. Instalação do PostgreSQL
 
-Abra o terminal e execute os seguintes comandos:
+Para sistemas baseados em Debian/Ubuntu, abra o terminal e execute os seguintes comandos:
 
 ```bash
 sudo apt update
@@ -26,9 +26,9 @@ sudo apt install postgresql postgresql-contrib
     sudo -u postgres psql
     ```
 
-2.  **Crie um novo usuário (role).** Substitua `seu_usuario` e `sua_senha` por suas credenciais.
+2.  **Crie um novo usuário (role).** Substitua `consulta` e `teste123` por suas credenciais desejadas.
     ```sql
-    CREATE ROLE seu_usuario WITH LOGIN PASSWORD 'sua_senha';
+    CREATE ROLE consulta WITH LOGIN PASSWORD 'teste123';
     ```
 
 3.  **Crie o banco de dados.**
@@ -36,7 +36,7 @@ sudo apt install postgresql postgresql-contrib
     CREATE DATABASE seu_banco;
     ```
 
-4.  **Dê todas as permissões ao seu novo usuário no banco de dados criado.**
+4.  **Dê todas as permissões ao seu novo usuário no banco de dados criado.** Substitua `seu_banco` e `seu_usuario` se tiver usado nomes diferentes.
     ```sql
     GRANT ALL PRIVILEGES ON DATABASE seu_banco TO seu_usuario;
     ```
@@ -51,15 +51,19 @@ sudo apt install postgresql postgresql-contrib
 Certifique-se de ter o `pip` instalado. Em seguida, instale a biblioteca necessária:
 
 ```bash
-pip install psycopg2-binary
+pip install psycopg2-binary Faker
 ```
 
 ### 4. Execução do Script de Criação de Tabelas
 
-Execute o script `schema.sql` para criar as tabelas no seu banco de dados.
+Execute o script `schema.sql` para criar as tabelas no seu banco de dados. Se estiver usando Docker, o comando é:
 
 ```bash
-psql -U seu_usuario -d seu_banco -f schema.sql
+# Para Docker
+docker-compose exec -T postgres psql -U consulta -d evasao < schema.sql
+
+# Para instalação manual
+# psql -U seu_usuario -d seu_banco -f schema.sql
 ```
 Você precisará digitar a senha que criou anteriormente.
 
