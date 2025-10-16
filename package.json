@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "faker": "^6.6.6",
+    "Faker": "^0.7.2",
+    "psycopg2-binary": "^0.0.1"
+  }
+}
