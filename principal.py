@@ -1,6 +1,18 @@
-# principal.py
+#===================================================================
+#Scripit que faz a inicialização do BD
+import subprocess
+from pathlib import Path
 
-# Importações de Módulos
+ROOT = Path(__file__).parent
+
+def iniciar_banco():
+    script_path = ROOT / "start_docker_db.py"
+    subprocess.run(["python", str(script_path)], check=True)
+#===================================================================
+
+# Chama a função de inicialização
+iniciar_banco()
+# principal.py
 from conexion.db_connection import DBConnection
 from utils.splash_screen import SplashScreen
 from utils import config
