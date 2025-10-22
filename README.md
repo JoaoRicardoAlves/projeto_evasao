@@ -1,6 +1,6 @@
 # Sistema de Análise de Evasão Escolar
 
-> Um sistema de console para gerenciar e analisar dados sobre a evasão escolar no ensino médio, desenvolvido para a disciplina de Banco de Dados.
+> Sistema de console para gerenciar e analisar dados sobre a evasão escolar no ensino médio. O projeto utiliza Python, PostgreSQL e Docker para facilitar a configuração e execução.
 
 ---
 
@@ -9,14 +9,13 @@
 - ✨ Funcionalidades
 - 📂 Estrutura do Projeto
 - 📦 Pré-requisitos
-- 🚀 Começando
-  - 1. Configuração do Banco de Dados PostgreSQL
-  - 2. Configuração do Ambiente Python
+- 🚀 Executando com Docker (Recomendado)
+  - 1. Configuração do Ambiente
+  - 2. Iniciando a Aplicação
+- 🔧 Configuração Manual (Alternativa)
+  - 1. Instalação do PostgreSQL
+  - 2. Criação do Banco e Usuário
   - 3. Criação das Tabelas
-- ▶️ Executando o Projeto
-  - 1. Ajuste da Conexão
-  - 2. Povoando o Banco com Dados Fictícios
-  - 3. Iniciando a Aplicação
 
 ---
 
@@ -30,6 +29,7 @@
   - Evasão detalhada por aluno e escola.
   - Total de evasões agrupadas por motivo.
 - **Povoamento de Banco de Dados** com dados fictícios para testes e demonstração.
+- **Inicialização simplificada** com Docker Compose, que automatiza a criação e configuração do banco de dados.
 
 ## 📂 Estrutura do Projeto
 
@@ -52,69 +52,35 @@ projeto_evasao/
 │   └── splash_screen.py      # Tela inicial da aplicação
 ├── principal.py              # Ponto de entrada da aplicação
 ├── popular_banco.py          # Script para gerar dados fictícios
-└── schema.sql                # Script SQL para criar a estrutura do banco
+├── schema.sql                # Script SQL para criar a estrutura do banco
+├── docker-compose.yml        # Arquivo de configuração do Docker
+└── start_docker_db.py        # Script auxiliar para iniciar o container Docker
 ```
 
 ## 📦 Pré-requisitos
 
 - **Python 3.x**
-- **PostgreSQL**
+- **Docker** e **Docker Compose**
 - Bibliotecas Python: `psycopg2-binary`, `Faker`
 
-## 🚀 Começando
+---
 
-Siga os passos abaixo para configurar e executar o projeto em seu ambiente local.
+## 🚀 Executando com Docker (Recomendado)
 
-### 1. Configuração do Banco de Dados PostgreSQL
+A maneira mais fácil de executar o projeto é usando Docker. Ele cuidará de criar, configurar e iniciar o banco de dados PostgreSQL automaticamente.
 
-1.  **Instale o PostgreSQL** (exemplo para Debian/Ubuntu):
-    ```bash
-    sudo apt update
-    sudo apt install postgresql postgresql-contrib
-    ```
-
-2.  **Acesse o psql** como superusuário:
-    ```bash
-    sudo -u postgres psql
-    ```
-
-3.  **Crie o usuário e o banco de dados**. Substitua `consulta` e `teste123` se desejar.
-    ```sql
-    -- Crie um novo usuário (role) com senha
-    CREATE ROLE consulta WITH LOGIN PASSWORD 'teste123';
-
-    -- Crie o banco de dados
-    CREATE DATABASE evasao;
-
-    -- Dê todos os privilégios ao usuário no novo banco
-    GRANT ALL PRIVILEGES ON DATABASE evasao TO consulta;
-    ```
-
-4.  **Ajuste o método de autenticação**:
-    - Encontre o caminho do arquivo `pg_hba.conf`:
-      ```sql
-      SHOW hba_file;
-      ```
-    - Saia do psql com `\q`.
-    - Edite o arquivo (use o caminho retornado pelo comando anterior):
-      ```bash
-      sudo nano /etc/postgresql/16/main/pg_hba.conf
-      ```
-    - Altere a linha `local all all peer` para `local all all md5`.
-    - Salve o arquivo e reinicie o serviço do PostgreSQL:
-      ```bash
-      sudo systemctl reload postgresql
-      ```
-
-### 2. Configuração do Ambiente Python
+### 1. Configuração do Ambiente
 
 1.  **Crie e ative um ambiente virtual** na raiz do projeto:
     ```bash
     # Cria a pasta .venv
     python3 -m venv .venv
     
-    # Ativa o ambiente
+    # Ativa o ambiente (Linux/macOS)
     source .venv/bin/activate
+
+    # Ativa o ambiente (Windows)
+    # .\.venv\Scripts\activate
     ```
     *(Seu terminal deve agora exibir `(.venv)` no início do prompt)*
 
@@ -122,6 +88,54 @@ Siga os passos abaixo para configurar e executar o projeto em seu ambiente local
     ```bash
     pip install psycopg2-binary Faker
     ```
+
+### 2. Iniciando a Aplicação
+
+Execute o script principal. Ele irá:
+1.  Iniciar o container Docker com o banco de dados (se ainda não estiver rodando).
+2.  Verificar se o banco está vazio e, se estiver, populá-lo com dados fictícios.
+3.  Iniciar o menu principal do sistema.
+
+```bash
+python3 principal.py
+```
+
+Pronto! O sistema estará em execução.
+
+---
+
+## 🔧 Configuração Manual (Alternativa)
+
+Se você não quiser usar Docker, pode configurar um servidor PostgreSQL localmente.
+
+### 1. Instalação do PostgreSQL
+
+Instale o PostgreSQL em seu sistema operacional. Para sistemas baseados em Debian (como Ubuntu), você pode usar:
+```bash
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+```
+
+### 2. Criação do Banco e Usuário
+
+Acesse o `psql` e execute os seguintes comandos para criar o usuário e o banco de dados.
+
+```bash
+# Acesse como superusuário
+sudo -u postgres psql
+
+-- Crie um novo usuário (role) com senha
+CREATE ROLE consulta WITH LOGIN PASSWORD 'teste123';
+
+-- Crie o banco de dados
+CREATE DATABASE evasao;
+
+-- Dê todos os privilégios ao usuário no novo banco
+GRANT ALL PRIVILEGES ON DATABASE evasao TO consulta;
+
+-- Saia do psql
+\q
+```
 
 ### 3. Criação das Tabelas
 

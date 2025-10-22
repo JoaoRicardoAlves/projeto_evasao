@@ -17,6 +17,7 @@ from conexion.db_connection import DBConnection
 from utils.splash_screen import SplashScreen
 from utils import config
 from reports.relatorios import Relatorios
+from popular_banco import popular_banco_de_dados
 
 # Importações de Controllers
 from controller.controller_escola import ControllerEscola
@@ -37,6 +38,21 @@ ctrl_escola = ControllerEscola(db)
 ctrl_aluno = ControllerAluno(db)
 ctrl_evasao = ControllerEvasao(db)
 relatorios = Relatorios(db)
+
+def verificar_e_popular_banco():
+    """Verifica se o banco de dados está vazio e o popula se necessário."""
+    total_escolas = db.get_table_count('escola')
+    if total_escolas == 0:
+        print("Banco de dados vazio. Iniciando o processo de povoamento com dados fictícios.")
+        print("Isso pode levar alguns instantes...")
+        print("========================================================================")
+        popular_banco_de_dados(db)
+        print("========================================================================")
+        print("Povoamento do banco de dados concluído com sucesso!")
+        input("Pressione Enter para iniciar a aplicação...")
+    else:
+        print("Banco de dados já populado. Iniciando aplicação...")
+
 
 def run():
     config.clear_console()
@@ -173,4 +189,5 @@ def handle_remover():
             print("Opção inválida.")
 
 if __name__ == "__main__":
+    verificar_e_popular_banco()
     run()

@@ -1,12 +1,11 @@
 # popular_banco.py
 
 # Importações necessárias
-from faker import Faker
-import random
-from datetime import date
+import random, sys
+from faker import Faker # type: ignore
 
 # Importações do seu projeto
-from conexion.db_connection import DBConnection
+from conexion.db_connection import DBConnection # type: ignore
 from controller.controller_escola import ControllerEscola
 from controller.controller_aluno import ControllerAluno
 from controller.controller_evasao import ControllerEvasao
@@ -19,22 +18,13 @@ from model.evasao import Evasao
 # ====================================================================
 # Altere a quantidade de dados que deseja gerar
 NUM_ESCOLAS = 50
-NUM_ALUNOS = 2000
+NUM_ALUNOS = 1000
 PERCENTUAL_EVASAO = 0.15  # 15% dos alunos irão evadir
-
-# ATENÇÃO: Configure suas credenciais do banco de dados aqui
-db = DBConnection(db_name="evasao", user="consulta", password="teste123")
-# ====================================================================
 
 # Inicializa o Faker para gerar dados em português do Brasil
 faker = Faker('pt_BR')
 
-# Inicializa os controllers
-ctrl_escola = ControllerEscola(db)
-ctrl_aluno = ControllerAluno(db)
-ctrl_evasao = ControllerEvasao(db)
-
-def popular_escolas():
+def popular_escolas(db: DBConnection, ctrl_escola: ControllerEscola):
     """Gera e insere escolas no banco de dados."""
     print(f"Inserindo {NUM_ESCOLAS} escolas. Aguarde...")
     regioes = ["Sudeste", "Sul", "Nordeste", "Norte", "Centro-Oeste"]
@@ -50,11 +40,12 @@ def popular_escolas():
         
         # Exibe progresso a cada 10 inserções
         if (i + 1) % 10 == 0:
-            print(f"  {i + 1}/{NUM_ESCOLAS} escolas inseridas...")
+            sys.stdout.write(f"\r  {i + 1}/{NUM_ESCOLAS} escolas inseridas...")
+            sys.stdout.flush()
 
-    print("✔ Escolas populadas com sucesso!")
+    print("\n✔ Escolas populadas com sucesso!")
 
-def popular_alunos():
+def popular_alunos(db: DBConnection, ctrl_aluno: ControllerAluno):
     """Gera e insere alunos, associando-os a escolas existentes."""
     print(f"\nInserindo {NUM_ALUNOS} alunos. Isso pode levar um momento...")
     
@@ -81,11 +72,12 @@ def popular_alunos():
         
         # Exibe progresso a cada 100 inserções
         if (i + 1) % 100 == 0:
-            print(f"  {i + 1}/{NUM_ALUNOS} alunos inseridos...")
+            sys.stdout.write(f"\r  {i + 1}/{NUM_ALUNOS} alunos inseridos...")
+            sys.stdout.flush()
 
-    print("✔ Alunos populados com sucesso!")
+    print("\n✔ Alunos populados com sucesso!")
 
-def popular_evasoes():
+def popular_evasoes(db: DBConnection, ctrl_evasao: ControllerEvasao):
     """Gera e insere registros de evasão para um percentual de alunos."""
     print(f"\nGerando registros de evasão para {PERCENTUAL_EVASAO:.0%} dos alunos...")
     
@@ -120,20 +112,30 @@ def popular_evasoes():
         ctrl_evasao.inserir_evasao(nova_evasao)
         
         if (i + 1) % 50 == 0:
-            print(f"  {i + 1}/{num_evasoes} registros de evasão inseridos...")
+            sys.stdout.write(f"\r  {i + 1}/{num_evasoes} registros de evasão inseridos...")
+            sys.stdout.flush()
             
-    print("✔ Registros de evasão populados com sucesso!")
+    print("\n✔ Registros de evasão populados com sucesso!")
+
+def popular_banco_de_dados(db: DBConnection):
+    """Executa a rotina completa de povoamento do banco de dados."""
+    ctrl_escola = ControllerEscola(db)
+    ctrl_aluno = ControllerAluno(db)
+    ctrl_evasao = ControllerEvasao(db)
+
+    # A ordem é importante por causa das chaves estrangeiras!
+    popular_escolas(db, ctrl_escola)
+    popular_alunos(db, ctrl_aluno)
+    popular_evasoes(db, ctrl_evasao)
 
 if __name__ == "__main__":
+    # ATENÇÃO: Configure suas credenciais do banco de dados aqui para execução direta
+    db_connection = DBConnection(db_name="evasao", user="consulta", password="teste123")
+
     print("==============================================")
     print("== INICIANDO SCRIPT DE POPULAÇÃO DO BANCO   ==")
     print("==============================================")
-    
-    # A ordem é importante por causa das chaves estrangeiras!
-    popular_escolas()
-    popular_alunos()
-    popular_evasoes()
-    
+    popular_banco_de_dados(db_connection)
     print("\n==============================================")
     print("==         PROCESSO FINALIZADO            ==")
     print("==============================================")
