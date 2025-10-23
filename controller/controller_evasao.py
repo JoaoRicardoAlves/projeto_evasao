@@ -18,6 +18,16 @@ class ControllerEvasao:
                 evasoes.append(Evasao(id_evasao=row[0], motivo=row[1], aluno=aluno))
         return evasoes
 
+    def get_evasao_by_id(self, id_evasao: int):
+        query = "SELECT id_evasao, data_evasao, motivo, ano_letivo, id_aluno FROM evasao WHERE id_evasao = %s"
+        result = self.db.execute_query(query, (id_evasao,))
+        if result:
+            row = result[0]
+            aluno = self.ctrl_aluno.get_aluno_by_id(row[4])
+            if aluno:
+                return Evasao(id_evasao=row[0], data_evasao=row[1], motivo=row[2], ano_letivo=row[3], aluno=aluno)
+        return None
+
     def inserir_evasao(self, evasao: Evasao):
         query = "INSERT INTO evasao (data_evasao, motivo, ano_letivo, id_aluno) VALUES (%s, %s, %s, %s)"
         params = (evasao.data_evasao, evasao.motivo, evasao.ano_letivo, evasao.aluno.id_aluno)

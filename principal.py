@@ -105,6 +105,9 @@ def handle_inserir():
             nova_escola = Escola(nome_escola=nome, cidade=cidade, estado=estado, regiao=regiao)
             ctrl_escola.inserir_escola(nova_escola)
         elif entidade == '2': # Aluno
+            if ctrl_escola.get_table_count('escola') == 0:
+                print("\nERRO: Nenhuma escola cadastrada. Insira uma escola primeiro.")
+                continue
             nome = input("Nome do aluno: ")
             dt_nasc = input("Data de Nascimento (YYYY-MM-DD): ")
             
@@ -118,6 +121,9 @@ def handle_inserir():
             else:
                 print("Escola não encontrada.")
         elif entidade == '3': # Evasão
+            if ctrl_aluno.get_table_count('aluno') == 0:
+                print("\nERRO: Nenhum aluno cadastrado. Insira um aluno primeiro.")
+                continue
             motivo = input("Motivo da evasão: ")
             data_evasao = input("Data da evasão (YYYY-MM-DD): ")
             ano_letivo = int(input("Ano letivo da evasão: "))
@@ -135,6 +141,8 @@ def handle_inserir():
             break
         else:
             print("Opção inválida.")
+        # Sai do loop de inserção após uma operação bem-sucedida
+        break
 
 def handle_atualizar():
     while True:
@@ -142,51 +150,122 @@ def handle_atualizar():
         if entidade == '1': # Escola
             escolas = ctrl_escola.get_all_escolas()
             for e in escolas: print(e.to_string())
-            id_escola = int(input("ID da escola a ser atualizada: "))
-            escola_existente = ctrl_escola.get_escola_by_id(id_escola)
-            if escola_existente:
-                nome = input(f"Novo nome ({escola_existente.nome_escola}): ") or escola_existente.nome_escola
-                cidade = input(f"Nova cidade ({escola_existente.cidade}): ") or escola_existente.cidade
-                estado = input(f"Novo estado ({escola_existente.estado}): ") or escola_existente.estado
-                regiao = input(f"Nova região ({escola_existente.regiao}): ") or escola_existente.regiao
-                escola_atualizada = Escola(id_escola, nome, cidade, estado, regiao)
-                ctrl_escola.atualizar_escola(escola_atualizada)
-            else:
-                print("Escola não encontrada.")
-        # Adicionar lógica para Aluno e Evasão similarmente...
+            try:
+                id_escola = int(input("ID da escola a ser atualizada: "))
+                escola_existente = ctrl_escola.get_escola_by_id(id_escola)
+                if escola_existente:
+                    nome = input(f"Novo nome ({escola_existente.nome_escola}): ") or escola_existente.nome_escola
+                    cidade = input(f"Nova cidade ({escola_existente.cidade}): ") or escola_existente.cidade
+                    estado = input(f"Novo estado ({escola_existente.estado}): ") or escola_existente.estado
+                    regiao = input(f"Nova região ({escola_existente.regiao}): ") or escola_existente.regiao
+                    escola_atualizada = Escola(id_escola, nome, cidade, estado, regiao)
+                    ctrl_escola.atualizar_escola(escola_atualizada)
+                else:
+                    print("Escola não encontrada.")
+            except ValueError:
+                print("ID inválido. Por favor, insira um número.")
+        elif entidade == '2': # Aluno
+            alunos = ctrl_aluno.get_all_alunos()
+            for a in alunos: print(a.to_string())
+            try:
+                id_aluno = int(input("ID do aluno a ser atualizado: "))
+                aluno_existente = ctrl_aluno.get_aluno_by_id(id_aluno)
+                if aluno_existente:
+                    nome = input(f"Novo nome ({aluno_existente.nome_aluno}): ") or aluno_existente.nome_aluno
+                    dt_nasc = input(f"Nova data de nascimento ({aluno_existente.data_nascimento}): ") or aluno_existente.data_nascimento
+                    
+                    escolas = ctrl_escola.get_all_escolas()
+                    for e in escolas: print(e.to_string())
+                    id_escola = input(f"Novo ID da escola ({aluno_existente.escola.id_escola}): ")
+                    
+                    escola_nova = ctrl_escola.get_escola_by_id(int(id_escola)) if id_escola else aluno_existente.escola
+
+                    if escola_nova:
+                        aluno_atualizado = Aluno(id_aluno, nome, dt_nasc, escola_nova)
+                        ctrl_aluno.atualizar_aluno(aluno_atualizado)
+                    else:
+                        print("Nova escola não encontrada.")
+                else:
+                    print("Aluno não encontrado.")
+            except ValueError:
+                print("ID inválido. Por favor, insira um número.")
+        elif entidade == '3': # Evasão
+            evasoes = ctrl_evasao.get_all_evasoes()
+            for ev in evasoes: print(ev.to_string())
+            try:
+                id_evasao = int(input("ID do registro de evasão a ser atualizado: "))
+                evasao_existente = ctrl_evasao.get_evasao_by_id(id_evasao) # Supondo que este método exista
+                if evasao_existente:
+                    motivo = input(f"Novo motivo ({evasao_existente.motivo}): ") or evasao_existente.motivo
+                    data_evasao = input(f"Nova data ({evasao_existente.data_evasao}): ") or str(evasao_existente.data_evasao)
+                    ano_letivo = input(f"Novo ano letivo ({evasao_existente.ano_letivo}): ") or evasao_existente.ano_letivo
+                    
+                    # A lógica para alterar o aluno associado pode ser complexa, vamos manter o mesmo.
+                    evasao_atualizada = Evasao(id_evasao, data_evasao, motivo, int(ano_letivo), evasao_existente.aluno)
+                    ctrl_evasao.atualizar_evasao(evasao_atualizada)
+                else:
+                    print("Registro de evasão não encontrado.")
+            except ValueError:
+                print("ID ou ano inválido. Por favor, insira um número.")
+            except Exception as e:
+                print(f"Ocorreu um erro: {e}")
+                print("Verifique se o método get_evasao_by_id existe no ControllerEvasao.")
+
         elif entidade == '4':
             break
         else:
             print("Opção inválida.")
+        # Sai do loop de atualização após uma operação
+        break
 
 def handle_remover():
     while True:
         entidade = config.menu_entidades("Remover")
         if entidade == '1': # Escola
             escolas = ctrl_escola.get_all_escolas()
+            if not escolas:
+                print("Nenhuma escola para remover.")
+                break
             for e in escolas: print(e.to_string())
-            id_escola = int(input("ID da escola a ser removida: "))
-            confirm = input(f"Tem certeza que deseja remover a escola ID {id_escola}? (S/N): ").upper()
-            if confirm == 'S':
-                ctrl_escola.remover_escola(id_escola)
+            try:
+                id_escola = int(input("ID da escola a ser removida: "))
+                confirm = input(f"Tem certeza que deseja remover a escola ID {id_escola}? (S/N): ").upper()
+                if confirm == 'S':
+                    ctrl_escola.remover_escola(id_escola)
+            except ValueError:
+                print("ID inválido. Por favor, insira um número.")
         elif entidade == '2': # Aluno
             alunos = ctrl_aluno.get_all_alunos()
+            if not alunos:
+                print("Nenhum aluno para remover.")
+                break
             for a in alunos: print(a.to_string())
-            id_aluno = int(input("ID do aluno a ser removido: "))
-            confirm = input(f"Tem certeza que deseja remover o aluno ID {id_aluno}? (S/N): ").upper()
-            if confirm == 'S':
-                ctrl_aluno.remover_aluno(id_aluno)
+            try:
+                id_aluno = int(input("ID do aluno a ser removido: "))
+                confirm = input(f"Tem certeza que deseja remover o aluno ID {id_aluno}? (S/N): ").upper()
+                if confirm == 'S':
+                    ctrl_aluno.remover_aluno(id_aluno)
+            except ValueError:
+                print("ID inválido. Por favor, insira um número.")
         elif entidade == '3': # Evasão
             evasoes = ctrl_evasao.get_all_evasoes()
+            if not evasoes:
+                print("Nenhum registro de evasão para remover.")
+                break
             for ev in evasoes: print(ev.to_string())
-            id_evasao = int(input("ID do registro de evasão a ser removido: "))
-            confirm = input(f"Tem certeza que deseja remover a evasão ID {id_evasao}? (S/N): ").upper()
-            if confirm == 'S':
-                ctrl_evasao.remover_evasao(id_evasao)
+            try:
+                id_evasao = int(input("ID do registro de evasão a ser removido: "))
+                confirm = input(f"Tem certeza que deseja remover a evasão ID {id_evasao}? (S/N): ").upper()
+                if confirm == 'S':
+                    ctrl_evasao.remover_evasao(id_evasao)
+            except ValueError:
+                print("ID inválido. Por favor, insira um número.")
         elif entidade == '4':
             break
         else:
             print("Opção inválida.")
+        # Sai do loop de remoção após uma operação
+        break
 
 if __name__ == "__main__":
     verificar_e_popular_banco()

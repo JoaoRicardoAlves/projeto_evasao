@@ -2,6 +2,7 @@
 from conexion.db_connection import DBConnection
 from model.aluno import Aluno
 from controller.controller_escola import ControllerEscola
+from model.escola import Escola
 
 class ControllerAluno:
     def __init__(self, db_connection: DBConnection):
