@@ -105,7 +105,7 @@ def handle_inserir():
             nova_escola = Escola(nome_escola=nome, cidade=cidade, estado=estado, regiao=regiao)
             ctrl_escola.inserir_escola(nova_escola)
         elif entidade == '2': # Aluno
-            if ctrl_escola.get_table_count('escola') == 0:
+            if db.get_table_count('escola') == 0:
                 print("\nERRO: Nenhuma escola cadastrada. Insira uma escola primeiro.")
                 continue
             nome = input("Nome do aluno: ")
@@ -121,7 +121,7 @@ def handle_inserir():
             else:
                 print("Escola não encontrada.")
         elif entidade == '3': # Evasão
-            if ctrl_aluno.get_table_count('aluno') == 0:
+            if db.get_table_count('aluno') == 0:
                 print("\nERRO: Nenhum aluno cadastrado. Insira um aluno primeiro.")
                 continue
             motivo = input("Motivo da evasão: ")
