@@ -26,7 +26,7 @@ class SplashScreen:
         print(f"2 - ALUNOS: {counts['alunos']}")
         print(f"3 - EVASÕES: {counts['evasoes']}")
         print("\nCRIADO POR:")
-        print("- JOAO RICARDO")
+        print("- JOAO RICARDO, KEVEN PEREIRA, MATHEUS CARVALHO, DAVI MARTILIO, FERNANDO BICALHO")
         print("\nDISCIPLINA: Banco de Dados")
         print(f"{datetime.now().year}/{'1' if datetime.now().month < 7 else '2'}")
         print("PROFESSOR: Howard Roatti")
